@@ -1,0 +1,145 @@
+# 📈 Equity Watch — Daily Email Setup Guide
+
+A daily stock briefing emailed to you every weekday morning at **7:00 AM ET**, 
+with live prices, day changes, and a link to your full interactive dashboard.
+
+---
+
+## What you'll need (all free)
+- A **GitHub account** → github.com (free)
+- A **Gmail account** (yours is fine)
+- About **10 minutes** to set up
+
+---
+
+## STEP 1 — Create your GitHub repository
+
+1. Go to **github.com** and sign in (or create a free account)
+2. Click the **green "New"** button (top left)
+3. Name it: `equity-watch`
+4. Set it to **Public** ✅ (required for free GitHub Pages hosting)
+5. Click **"Create repository"**
+
+---
+
+## STEP 2 — Upload the files
+
+Upload these files to your new repo (drag & drop on GitHub, or use the "Add file" button):
+
+```
+equity-watch/
+├── .github/
+│   └── workflows/
+│       └── daily_email.yml        ← the scheduler
+├── scripts/
+│   └── send_email.py              ← the email script
+├── index.html                     ← your dashboard (the equity-watch-v2.html file, renamed)
+└── README.md
+```
+
+**Important:** Rename `equity-watch-v2.html` → `index.html` before uploading.
+
+To upload:
+- Click **"Add file"** → **"Upload files"** on GitHub
+- Drag all files/folders in
+- Click **"Commit changes"**
+
+---
+
+## STEP 3 — Enable GitHub Pages (your dashboard link)
+
+1. In your repo, click **Settings** (top nav)
+2. Scroll to **"Pages"** in the left sidebar
+3. Under "Source", select **"Deploy from a branch"**
+4. Branch: **main**, folder: **/ (root)**
+5. Click **Save**
+6. Wait ~1 minute, then your dashboard will be live at:
+   ```
+   https://YOUR_GITHUB_USERNAME.github.io/equity-watch/
+   ```
+   Copy this URL — you'll need it in Step 4.
+
+---
+
+## STEP 4 — Create a Gmail App Password
+
+Gmail requires an "App Password" instead of your regular password for scripts.
+
+1. Go to **myaccount.google.com**
+2. Click **Security** in the left sidebar
+3. Under "How you sign in to Google", click **2-Step Verification** (enable it if not already on)
+4. Scroll to the bottom → click **"App passwords"**
+5. Enter a name like `equity-watch` → click **Create**
+6. Google shows you a **16-character password** — copy it immediately (you won't see it again)
+
+---
+
+## STEP 5 — Add your secrets to GitHub
+
+This keeps your email/password private (never in code).
+
+1. In your GitHub repo, click **Settings**
+2. Click **"Secrets and variables"** → **"Actions"** in the left sidebar
+3. Click **"New repository secret"** and add each of these 4 secrets:
+
+| Secret Name | Value |
+|---|---|
+| `RECIPIENT_EMAIL` | The email address to send TO (can be same as Gmail) |
+| `GMAIL_USER` | Your full Gmail address (e.g. you@gmail.com) |
+| `GMAIL_APP_PASS` | The 16-character app password from Step 4 |
+| `PAGES_URL` | Your GitHub Pages URL from Step 3 |
+
+---
+
+## STEP 6 — Test it manually
+
+1. In your repo, click the **"Actions"** tab
+2. Click **"Daily Equity Watch Email"** in the left list
+3. Click **"Run workflow"** → **"Run workflow"** (green button)
+4. Watch the run complete (takes ~20 seconds)
+5. Check your inbox — you should receive the email!
+
+---
+
+## Schedule
+
+Emails arrive automatically every **weekday (Mon–Fri) at 7:00 AM Eastern**.  
+No action needed after setup. GitHub runs it for free on their servers.
+
+To change the time, edit `.github/workflows/daily_email.yml` and change the cron line:
+- `0 11 * * 1-5` = 7 AM ET (during EDT, summer)
+- `0 12 * * 1-5` = 7 AM ET (during EST, winter)
+
+---
+
+## What the email includes
+
+- 📊 Live price for each stock (from Yahoo Finance)
+- ▲▼ Today's % change
+- vs Yesterday's price (tracked automatically)
+- **NOTABLE MOVE** badge on any stock moving ≥1.5%
+- Analyst consensus rating & upside target
+- Market cap and sector
+- A button linking to your full interactive dashboard
+
+---
+
+## Troubleshooting
+
+**Email not arriving?**
+- Check your spam folder
+- Verify the App Password is correct (no spaces)
+- Make sure 2-Step Verification is ON in your Google account
+
+**Actions run failing?**
+- Click the failed run in the Actions tab to see the error log
+- Most common issue: wrong secret name (must match exactly)
+
+**Want to add more stocks?**
+- Edit `scripts/send_email.py`
+- Add the ticker to the `TICKERS` list
+- Add an entry to `STOCK_META`
+
+---
+
+*Equity Watch is for informational purposes only. Not financial advice.*
