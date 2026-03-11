@@ -1,0 +1,44 @@
+name: Daily Equity Watch Email
+
+on:
+  schedule:
+    # 7:00 AM Eastern = 12:00 UTC (EST) / 11:00 UTC (EDT)
+    - cron: "0 12 * * 1-5"   # weekdays only, Mon–Fri
+  workflow_dispatch:           # allows manual trigger from GitHub UI
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ── Restore yesterday's price data (so we can show changes) ──
+      - name: Restore previous data cache
+        uses: actions/cache@v4
+        with:
+          path: prev_data.json
+          key: prev-data-${{ runner.os }}
+          restore-keys: |
+            prev-data-
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run email script
+        env:
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          GMAIL_USER:      ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASS:  ${{ secrets.GMAIL_APP_PASS }}
+          PAGES_URL:       ${{ secrets.PAGES_URL }}
+        run: python scripts/send_email.py
+
+      # ── Save today's prices so tomorrow can compare ──
+      - name: Save updated price cache
+        uses: actions/cache@v4
+        with:
+          path: prev_data.json
+          key: prev-data-${{ runner.os }}
